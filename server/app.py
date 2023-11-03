@@ -44,7 +44,8 @@ def receive_spell(spell: Spell) -> DecodedSpell:
 
     run_command = decoded_command.split(" ")[0]
     if run_command not in allow_commands:
-        raise HTTPException(status_code=400, detail=f"not allow command: {run_command}")
+        print(f"not allow command: {spell.text} => {run_command}")
+        raise HTTPException(status_code=400, detail=f"not allow command: {spell.text} => {run_command}")
 
     reserved_decoded_spell = DecodedSpell(spell=spell.text, command=decoded_command)
 
@@ -61,7 +62,7 @@ def reserved_spell() -> DecodedSpell:
 
 
 @app.post("/chant-spell")
-def chant_spell() -> DecodedSpell:
+def chant_spell() -> str:
     global reserved_decoded_spell
     if reserved_decoded_spell is None:
         raise HTTPException(status_code=400, detail="not reserved spell")
@@ -69,6 +70,6 @@ def chant_spell() -> DecodedSpell:
     # コマンドを実行する
     runned_spell = reserved_decoded_spell
     reserved_decoded_spell = None
-    subprocess.run(runned_spell.command, shell=True)
+    result = subprocess.run(runned_spell.command, capture_output=True, text=True, shell=True).stdout
 
-    return runned_spell
+    return result

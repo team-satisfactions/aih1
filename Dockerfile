@@ -21,4 +21,6 @@ RUN pipenv sync --dev
 COPY ./server/app.py ./app.py
 COPY ./server/static/ ./static
 
+RUN apt install -y eject
+
 CMD ["pipenv", "run", "uvicorn", "app:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]

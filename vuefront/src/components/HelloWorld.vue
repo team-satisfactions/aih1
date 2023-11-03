@@ -1,6 +1,13 @@
 <template>
   <div class="hello">
-    <template v-if="command">
+    <template v-if="commandResult">
+      <h1>{{ spell }}</h1>
+      <h1>↓</h1>
+      <h1>$ {{ command }}</h1>
+      <h1>↓</h1>
+      <h1>$ {{ commandResult }}</h1>
+    </template>
+    <template v-else-if="command">
       <h1>{{ spell }}</h1>
       <h1>↓</h1>
       <h1>$ {{ command }}</h1>
@@ -30,11 +37,13 @@ export default {
   setup(){
     const spell = ref('')
     const command = ref('')
+    const commandResult = ref('')
     onMounted(() => {
       console.log(`initial`)
       let int_id = NaN;
       let interval = ()=> {
         return setTimeout(()=>{
+          commandResult.value = '';
           //axios.get('http://192.168.106.214:8000/reserved-spell')
           axios.get('http://localhost:8000/reserved-spell')
           .then(res => {
@@ -59,9 +68,13 @@ export default {
           console.log(`command changed`)
           setTimeout(()=>{
             axios.post('http://localhost:8000/chant-spell').then(res => {
+              commandResult.value = res.data
               console.log(res)
-              int_id = interval()
               console.log(spell.value,command.value)
+
+              setTimeout(() => {
+                int_id = interval()
+              }, 2000);
             }).catch(err => {
               console.log(err)
             });
@@ -71,7 +84,7 @@ export default {
         }
       })
     })
-    return { spell, command }
+    return { spell, command, commandResult }
   }
 }
 
