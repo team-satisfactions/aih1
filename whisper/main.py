@@ -69,18 +69,19 @@ def record_audio(filename):
         print("not found OpenComm2")
         exit(1)
 
-    frames_per_buffer = 1024 // 5
+    frames_per_buffer = 1024
     print(device_index)
+
+    stream = p.open(format=pyaudio.paInt16,
+                    channels=1,
+                    rate=16000,
+                    input=True,
+                    input_device_index=device_index,
+                    frames_per_buffer=frames_per_buffer)
+
     while True:
         while not recording:
-            time.sleep(0.01)
-
-        stream = p.open(format=pyaudio.paInt16,
-                        channels=1,
-                        rate=16000,
-                        input=True,
-                        input_device_index=device_index,
-                        frames_per_buffer=frames_per_buffer)
+            _ = stream.read(frames_per_buffer)
 
         frames = []
 
@@ -92,8 +93,6 @@ def record_audio(filename):
 
         print("Stopped recording.")
 
-        stream.stop_stream()
-        stream.close()
 
         wf = wave.open(filename, 'wb')
         wf.setnchannels(1)
@@ -106,6 +105,8 @@ def record_audio(filename):
 
         process.stdin.write("\n")
         process.stdin.flush()
+    stream.stop_stream()
+    stream.close()
 
 # キーが押されている間録音するフラグ
 recording = False
