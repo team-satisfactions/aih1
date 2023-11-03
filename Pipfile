@@ -8,6 +8,9 @@ pynput = "*"
 pyaudio = "*"
 wave = "*"
 requests = "*"
+fastapi = "*"
+uvicorn = "*"
+pydantic = "*"
 
 [dev-packages]
 
