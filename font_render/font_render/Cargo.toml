@@ -7,4 +7,4 @@ edition = "2021"
 
 [dependencies]
 rustybuzz = "0.11.0"
-ttf2mesh = { path = "/Users/yuta/ghq/github.com/higumachan/ttf2mesh-rs" }
+ttf2mesh = { path = "../ttf2mesh-rs" }
