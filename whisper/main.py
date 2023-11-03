@@ -6,7 +6,10 @@ import pyaudio
 import threading
 from pynput import keyboard
 from pynput.keyboard import Key
+import requests
 
+
+SEND_URI = "http://192.168.106.214:8000/receive-spell"
 
 
 # 録音関数
@@ -18,7 +21,7 @@ def record_audio(filename):
 
     info = p.get_host_api_info_by_index(0)
     numdevices = info.get('deviceCount')
-    device_index = 1
+    device_index = -1
     for i in range(0, numdevices):
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
             name = p.get_device_info_by_host_api_device_index(0, i).get('name')
@@ -27,6 +30,9 @@ def record_audio(filename):
                 print("found OpenComm2")
                 device_index = int(i)
                 break
+    if device_index == -1:
+        print("not found OpenComm2")
+        exit(1)
 
     print(device_index)
     while True:
@@ -75,13 +81,15 @@ def record_audio(filename):
         whisper_text = whisper_response["transcription"][0]["text"]
         print(f"whisper_text: \"{whisper_text}\"")
 
+        requests.post(SEND_URI, json={"text": whisper_text.replace(" ", "")})
+        print("finish post")
+
 
 # キーが押されている間録音するフラグ
 recording = False
 
 def on_press(key):
     global recording
-    print('{0} pressed'.format(key))
     if key == Key.space:
         recording = True
 
