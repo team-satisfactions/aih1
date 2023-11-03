@@ -39,7 +39,7 @@ allow_commands = ["eject", "ls", "echo"]
 @app.post("/reserve-spell")
 def receive_spell(spell: Spell) -> DecodedSpell:
     global reserved_decoded_spell
-    command = f"PATH=$PATH:/Users/goya/.nvm/versions/node/v21.0.0/bin /Users/goya/.nvm/versions/node/v21.0.0/bin/chant -d {spell.text}"
+    command = f"chant -d {spell.text}"
     decoded_command = subprocess.run(command, capture_output=True, text=True, shell=True).stdout.replace("\n", "")
 
     run_command = decoded_command.split(" ")[0]
@@ -68,5 +68,7 @@ def chant_spell() -> DecodedSpell:
 
     # コマンドを実行する
     subprocess.run(reserved_decoded_spell.command, shell=True)
+    runned_spell = reserved_decoded_spell
+    reserved_decoded_spell = None
 
-    return reserved_decoded_spell
+    return runned_spell
