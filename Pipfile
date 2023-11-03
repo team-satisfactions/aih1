@@ -4,13 +4,11 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pynput = "*"
-pyaudio = "*"
-wave = "*"
 requests = "*"
 fastapi = "*"
 uvicorn = "*"
 pydantic = "*"
+typing-extensions = "*"
 
 [dev-packages]
 
