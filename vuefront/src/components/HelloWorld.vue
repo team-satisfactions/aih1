@@ -13,7 +13,7 @@
 <script>
 /* eslint-disable */
 import axios from 'axios';
-import { ref, onMounted, watch, watchEffect} from 'vue'
+import { nextTick, ref, onMounted, watch, watchEffect} from 'vue'
 //import VueAnimXyz from '@animxyz/vue3'
 export default {
   name: 'HelloWorld',
@@ -38,12 +38,15 @@ export default {
       let int_id = NaN;
       let interval = ()=> {
         return setTimeout(()=>{
-          axios.get('http://localhost:8080/reserved-spell.json')
-          //axios.get('http://localhost:8000/reserved-spell')
-          .then(res => {
+          axios.get('http://localhost:8000/reserved-spell')
+          .then(async res => {
             clearTimeout(int_id)
             let data = res.data
             console.log(data)
+            spell.value = ''
+            command.value = ''
+            commandResult.value = ''
+            await nextTick()
             sussess(data)
           }).catch(err => {
             console.log(err)
@@ -55,7 +58,8 @@ export default {
       let sussess = (data)=>{
         spell.value = data.spell
         command.value = data.command
-        if(command.value) {
+        const succeeded = data.succeeded
+        if(command.value && succeeded) {
           console.log(int_id)
           console.log(spell.value,command.value)
           console.log(`command changed`)
@@ -72,6 +76,10 @@ export default {
               console.log(err)
             });
           },2000)
+        } else {
+          setTimeout(() => {
+            int_id = interval()
+          }, 2000);
         }
       }
     })
