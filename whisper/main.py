@@ -60,12 +60,16 @@ def record_audio(filename):
             print("Input Device id ", i, " - ", name)
             if name.startswith("OpenComm2"):
                 print("found OpenComm2")
+                device_info = p.get_device_info_by_index(i)
+                print(f'Default Sample Rate: {device_info["defaultSampleRate"]}')
+                print(f'Max Input Channels: {device_info}')
                 device_index = int(i)
                 break
     if device_index == -1:
         print("not found OpenComm2")
         exit(1)
 
+    frames_per_buffer = 1024 // 5
     print(device_index)
     while True:
         while not recording:
@@ -76,14 +80,14 @@ def record_audio(filename):
                         rate=16000,
                         input=True,
                         input_device_index=device_index,
-                        frames_per_buffer=1024)
+                        frames_per_buffer=frames_per_buffer)
 
         frames = []
 
         print("Recording... Press and hold 'r' to stop recording")
 
         while recording:
-            data = stream.read(1024)
+            data = stream.read(frames_per_buffer)
             frames.append(data)
 
         print("Stopped recording.")
