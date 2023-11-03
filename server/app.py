@@ -4,6 +4,7 @@ from typing import Optional
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import HTMLResponse
 from starlette.staticfiles import StaticFiles
 
 app = FastAPI()
@@ -29,6 +30,7 @@ class Spell(BaseModel):
 class DecodedSpell(BaseModel):
     spell: str
     command: str
+
 
 
 reserved_decoded_spell: Optional[DecodedSpell] = None
@@ -73,3 +75,10 @@ def chant_spell() -> str:
     result = subprocess.run(runned_spell.command, capture_output=True, text=True, shell=True).stdout
 
     return result
+
+
+@app.get("/render")
+def render(text: str):
+    print(text)
+    render_svg = subprocess.run(["bin/font_render", text], capture_output=True, ).stdout.decode("utf-8")
+    return HTMLResponse(content=render_svg, status_code=200)
