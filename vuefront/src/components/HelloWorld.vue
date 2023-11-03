@@ -72,6 +72,9 @@ export default {
             setTimeout(()=>{
               axios.post('http://localhost:8000/chant-spell').then(res => {
                 commandResult.value = res.data
+                if(commandResult.value){
+                  commandResult.value = '0'
+                }
                 console.log(res)
                 console.log(spell.value,command.value)
                 setTimeout(() => {
