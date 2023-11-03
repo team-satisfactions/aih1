@@ -9,12 +9,44 @@ from pynput.keyboard import Key
 import requests
 
 
-SEND_URI = "http://192.168.106.214:8000/reserve-spell"
+SEND_URI = "http://192.168.106.220:8000/reserve-spell"
+process = None
+
+def whisper_runner(filename):
+    global process
+    while True:
+        print("start whisper")
+        # ここに音声認識の処理を書く
+        process = subprocess.Popen(["./whisper/whisper.cpp/main",
+            "-t", "9",
+            "-f", "output.wav",
+            "-m", "./whisper/whisper.cpp/models/ggml-large.bin",
+            "-l", "ja", "--output-json",
+            "--output-file", "text", "--prompt", "竜神 慈悲 轟け"], stdin=subprocess.PIPE,
+                                      stderr=subprocess.DEVNULL,
+                                   text=True)
+
+        process.wait()
+        print("finish whisper")
+
+        whisper_response = json.load(open("text.json", "r", encoding="utf-8"))
+
+        whisper_text = whisper_response["transcription"][0]["text"]
+        print(f"whisper_text: \"{whisper_text}\"")
+
+        try:
+            requests.post(SEND_URI, json={"text": whisper_text.replace(" ", "")})
+        except:
+            print("failed to post")
+        finally:
+            print("finish post")
+
 
 
 # 録音関数
 def record_audio(filename):
     global recording
+    global process
     print("start record thread")
 
     p = pyaudio.PyAudio()
@@ -37,7 +69,7 @@ def record_audio(filename):
     print(device_index)
     while True:
         while not recording:
-            time.sleep(0.001)
+            time.sleep(0.01)
 
         stream = p.open(format=pyaudio.paInt16,
                         channels=1,
@@ -66,24 +98,10 @@ def record_audio(filename):
         wf.writeframes(b''.join(frames))
         wf.close()
 
-        print("start whisper")
-        # ここに音声認識の処理を書く
-        subprocess.run([
-            "./whisper/whisper.cpp/main",
-            "-t", "9",
-            "-f", "output.wav",
-            "-m", "./whisper/whisper.cpp/models/ggml-large.bin",
-            "-l", "ja", "--output-json",
-            "--output-file", "text"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        print("finish whisper")
-        whisper_response = json.load(open("text.json", "r", encoding="utf-8"))
+        print("Saved recording.")
 
-        whisper_text = whisper_response["transcription"][0]["text"]
-        print(f"whisper_text: \"{whisper_text}\"")
-
-        requests.post(SEND_URI, json={"text": whisper_text.replace(" ", "")})
-        print("finish post")
-
+        process.stdin.write("\n")
+        process.stdin.flush()
 
 # キーが押されている間録音するフラグ
 recording = False
@@ -102,5 +120,6 @@ def on_release(key):
 if __name__ == '__main__':
     # キーボードリスナーをセットアップ
     threading.Thread(target=record_audio, args=('output.wav',)).start()
+    threading.Thread(target=whisper_runner, args=('output.wav',)).start()
     with keyboard.Listener(on_press=on_press, on_release=on_release) as listener:
         listener.join()
