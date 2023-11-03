@@ -1,22 +1,12 @@
 <template>
   <div class="hello">
-    <template v-if="commandResult">
-      <h1>{{ spell }}</h1>
+    <XyzTransitionGroup class="item-group" xyz="stagger-2 narrow-100%">
+      <h1 class="square" v-if="spell">{{ spell }}</h1>
       <h1>↓</h1>
-      <h1>$ {{ command }}</h1>
+      <h1 class="square" v-if="command">$ {{ command }}</h1>
       <h1>↓</h1>
-      <h1>$ {{ commandResult }}</h1>
-    </template>
-    <template v-else-if="command">
-      <h1>{{ spell }}</h1>
-      <h1>↓</h1>
-      <h1>$ {{ command }}</h1>
-    </template>
-    <template v-else>
-      <h1>{{ spell }}</h1>
-      <h1>↓</h1>
-      <h1>{{ command }}</h1>
-    </template>
+      <h1 class="square" v-if="commandResult">{{ commandResult }}</h1>
+    </XyzTransitionGroup>
   </div>
 </template>
 
@@ -24,6 +14,7 @@
 /* eslint-disable */
 import axios from 'axios';
 import { ref, onMounted, watch, watchEffect} from 'vue'
+//import VueAnimXyz from '@animxyz/vue3'
 export default {
   name: 'HelloWorld',
   data(){
@@ -35,6 +26,10 @@ export default {
     msg: String
   },
   setup(){
+    const anime = ref(false)
+    setInterval(() => {
+      anime.value = !anime.value
+    }, 1000);
     const spell = ref('')
     const command = ref('')
     const commandResult = ref('')
@@ -43,26 +38,24 @@ export default {
       let int_id = NaN;
       let interval = ()=> {
         return setTimeout(()=>{
-          commandResult.value = '';
-          //axios.get('http://192.168.106.214:8000/reserved-spell')
-          axios.get('http://localhost:8000/reserved-spell')
+          axios.get('http://localhost:8080/reserved-spell.json')
+          //axios.get('http://localhost:8000/reserved-spell')
           .then(res => {
             clearTimeout(int_id)
             let data = res.data
             console.log(data)
-            spell.value = data.spell
-            command.value = data.command
+            sussess(data)
           }).catch(err => {
-            spell.value = ''
-            command.value = ''
             console.log(err)
             int_id = interval()
           })
         }, 200)
       }
       int_id = interval()
-      watchEffect(()=>{
-        if(spell.value) {
+      let sussess = (data)=>{
+        spell.value = data.spell
+        command.value = data.command
+        if(command.value) {
           console.log(int_id)
           console.log(spell.value,command.value)
           console.log(`command changed`)
@@ -78,13 +71,11 @@ export default {
             }).catch(err => {
               console.log(err)
             });
-            // spell.value = ''
-            // command.value = ''
           },2000)
         }
-      })
+      }
     })
-    return { spell, command, commandResult }
+    return { spell, command, commandResult,anime }
   }
 }
 
@@ -105,5 +96,9 @@ li {
 }
 a {
   color: #42b983;
+}
+.item-group {
+  --xyz-translate-y: -350%;
+  --xyz-ease: cubic-bezier(0.5, -1.5, 0.5, 1.5);
 }
 </style>
