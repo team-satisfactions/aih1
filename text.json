@@ -25,8 +25,19 @@
 		"translate": false
 	},
 	"result": {
-		"language": "en"
+		"language": "ja"
 	},
 	"transcription": [
+		{
+			"timestamps": {
+				"from": "00:00:00,000",
+				"to": "00:00:02,240"
+			},
+			"offsets": {
+				"from": 0,
+				"to": 2240
+			},
+			"text": "そう、勇者公募を"
+		}
 	]
 }

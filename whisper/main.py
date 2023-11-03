@@ -31,8 +31,12 @@ def whisper_runner(filename):
 
         whisper_response = json.load(open("text.json", "r", encoding="utf-8"))
 
-        whisper_text = whisper_response["transcription"][0]["text"]
-        print(f"whisper_text: \"{whisper_text}\"")
+        try:
+            whisper_text = whisper_response["transcription"][0]["text"]
+            print(f"whisper_text: \"{whisper_text}\"")
+        except IndexError:
+            print("failed to get whisper_text")
+            continue
 
         try:
             requests.post(SEND_URI, json={"text": whisper_text.replace(" ", "")})

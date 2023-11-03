@@ -2,6 +2,7 @@
 
 #include "whisper.h"
 
+#include <iostream>
 #include <cmath>
 #include <fstream>
 #include <cstdio>
@@ -9,6 +10,7 @@
 #include <thread>
 #include <vector>
 #include <cstring>
+#include <chrono>
 
 #if defined(_MSC_VER)
 #pragma warning(disable: 4244 4267) // possible loss of data
@@ -850,6 +852,8 @@ bool output_lrc(struct whisper_context * ctx, const char * fname, const whisper_
 }
 
 int main(int argc, char ** argv) {
+    auto start_load = std::chrono::high_resolution_clock::now();
+
     whisper_params params;
 
     if (whisper_params_parse(argc, argv, params) == false) {
@@ -886,6 +890,14 @@ int main(int argc, char ** argv) {
 
     // initialize openvino encoder. this has no effect on whisper.cpp builds that don't have OpenVINO configured
     whisper_ctx_init_openvino_encoder(ctx, nullptr, params.openvino_encode_device.c_str(), nullptr);
+
+    auto end_load = std::chrono::high_resolution_clock::now();
+    auto duration_load = std::chrono::duration_cast<std::chrono::milliseconds>(end_load - start_load);
+    std::printf("finish load model: %ld ms\n", duration_load.count());
+    auto start = std::chrono::high_resolution_clock::now();
+
+    std::string line;
+    std::getline(std::cin, line);
 
     for (int f = 0; f < (int) params.fname_inp.size(); ++f) {
         const auto fname_inp = params.fname_inp[f];
@@ -1067,6 +1079,15 @@ int main(int argc, char ** argv) {
 
     whisper_print_timings(ctx);
     whisper_free(ctx);
+
+       // 計測終了
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // 経過時間を計算
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+
+//    std::cout << "Duration: " << duration.count() << " microseconds" << std::endl;
+    std::printf("Duration: %lld microseconds\n", duration.count());
 
     return 0;
 }
