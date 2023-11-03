@@ -19,7 +19,7 @@ COPY Pipfile.lock .
 RUN pipenv sync --dev
 
 COPY ./server/app.py ./app.py
-COPY ./server/static/ ./static
+#COPY ./server/static/ ./static
 
 RUN apt install -y eject
 
