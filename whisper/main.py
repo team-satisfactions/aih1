@@ -9,7 +9,7 @@ from pynput.keyboard import Key
 import requests
 
 
-SEND_URI = "http://192.168.106.214:8000/receive-spell"
+SEND_URI = "http://192.168.106.214:8000/reserve-spell"
 
 
 # 録音関数
