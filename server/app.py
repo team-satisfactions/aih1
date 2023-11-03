@@ -7,7 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
 app = FastAPI()
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/static", StaticFiles(directory="static", html=True), name="static")
 origins = [
     "*",
 ]
@@ -67,8 +67,8 @@ def chant_spell() -> DecodedSpell:
         raise HTTPException(status_code=400, detail="not reserved spell")
 
     # コマンドを実行する
-    subprocess.run(reserved_decoded_spell.command, shell=True)
     runned_spell = reserved_decoded_spell
     reserved_decoded_spell = None
+    subprocess.run(runned_spell.command, shell=True)
 
     return runned_spell
