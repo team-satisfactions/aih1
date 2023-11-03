@@ -36,7 +36,7 @@ export default {
       let interval = ()=> {
         return setTimeout(()=>{
           //axios.get('http://192.168.106.214:8000/reserved-spell')
-          axios.get('http://localhost:8080/reserved-spell')
+          axios.get('http://localhost:8000/reserved-spell')
           .then(res => {
             clearTimeout(int_id)
             let data = res.data
@@ -44,6 +44,8 @@ export default {
             spell.value = data.spell
             command.value = data.command
           }).catch(err => {
+            spell.value = ''
+            command.value = ''
             console.log(err)
             int_id = interval()
           })
@@ -56,10 +58,15 @@ export default {
           console.log(spell.value,command.value)
           console.log(`command changed`)
           setTimeout(()=>{
-            spell.value = ''
-            command.value = ''
-            int_id = interval()
-            console.log(spell.value,command.value)
+            axios.post('http://localhost:8000/chant-spell').then(res => {
+              console.log(res)
+              int_id = interval()
+              console.log(spell.value,command.value)
+            }).catch(err => {
+              console.log(err)
+            });
+            // spell.value = ''
+            // command.value = ''
           },2000)
         }
       })
