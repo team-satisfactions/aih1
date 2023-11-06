@@ -1,0 +1,8 @@
+/Users/yuta/Applications/CLion.app/Contents/bin/cmake/mac/bin/cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=/Users/yuta/Applications/CLion.app/Contents/bin/ninja/mac/ninja -G Ninja -S /Users/yuta/ghq/github.com/team-satisfactions/aih1/whisper/whisper.cpp -B /Users/yuta/ghq/github.com/team-satisfactions/aih1/whisper/whisper.cpp/cmake-build-debug
+-- Accelerate framework found
+-- Metal framework found
+-- CMAKE_SYSTEM_PROCESSOR: arm64
+-- ARM detected
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /Users/yuta/ghq/github.com/team-satisfactions/aih1/whisper/whisper.cpp/cmake-build-debug
